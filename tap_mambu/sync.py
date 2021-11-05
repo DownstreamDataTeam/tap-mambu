@@ -134,6 +134,12 @@ def process_records(catalog,  # pylint: disable=too-many-branches
 
         return max_bookmark_value, len(records)
 
+
+# ['branches', 'cards', 'communications', 'centres', 'clients', 'credit_arrangements', 'custom_field_sets',
+# 'deposit_accounts', 'deposit_products', 'deposit_transactions', 'groups', 'loan_accounts', 'loan_repayments',
+# 'loan_products', 'loan_transactions', 'tasks', 'users', 'gl_accounts', 'gl_journal_entries', 'activities',
+# 'index_rate_sources', 'installments', 'audit_trail']
+
 # Sync a specific parent or child endpoint.
 def sync_endpoint(client, #pylint: disable=too-many-branches
                   catalog,

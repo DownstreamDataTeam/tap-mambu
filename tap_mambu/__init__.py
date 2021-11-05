@@ -4,7 +4,7 @@ import sys
 import json
 import argparse
 import singer
-from singer import metadata, utils
+from singer import metadata, utils, Catalog
 from tap_mambu.client import MambuClient
 from tap_mambu.discover import discover
 from tap_mambu.sync import sync
@@ -29,8 +29,15 @@ def do_discover():
 
 @singer.utils.handle_top_exception(LOGGER)
 def main():
+    # parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
 
-    parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
+    # parser = argparse.ArgumentParser()
+    parsed_args = argparse.Namespace()
+    parsed_args.config = singer.utils.load_json("./config.json")
+    parsed_args.catalog = Catalog.load("./catalog.json")
+    parsed_args.state = {}
+    parsed_args.discover = None
+    parsed_args.properties = None
 
     with MambuClient(parsed_args.config.get('username'),
                      parsed_args.config.get('password'),
