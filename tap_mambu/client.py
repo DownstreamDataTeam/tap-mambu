@@ -1,6 +1,6 @@
 import backoff
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, ReadTimeout
 from singer import metrics
 import singer
 
@@ -103,16 +103,25 @@ class MambuClient(object):
                  subdomain,
                  apikey_audit,
                  page_size,
-                 user_agent=None):
+                 user_agent=None,
+                 full_domain=None):
         self.__username = username
         self.__password = password
         self.__subdomain = subdomain
         base_url = "https://{}.mambu.com/api".format(subdomain)
+        if full_domain is not None:
+            base_url = full_domain
         self.base_url = base_url
         self.page_size = page_size
         self.__user_agent = user_agent
         self.__apikey = apikey
         self.__session = requests.Session()
+        # self.__session.proxies.update({
+        #     "http": "http://localhost:1080",
+        #     "https": "https://localhost:1080",
+        #     "socks": "http://localhost:1080"
+        # })
+        self.__session.verify = False
         self.__verified = False
         self.__apikey_audit = apikey_audit
 
@@ -141,11 +150,11 @@ class MambuClient(object):
         headers = {}
         # Endpoint: simple API call to return a single record (org settings) to test access
         # https://support.mambu.com/docs/organisational-settings-api#get-organisational-settings
-        endpoint = 'settings/organization'
+        endpoint = 'setup/general'
         url = '{}/{}'.format(self.base_url, endpoint)
         if self.__user_agent:
             headers['User-Agent'] = self.__user_agent
-        headers['Accept'] = 'application/vnd.mambu.v1+json'
+        headers['Accept'] = 'application/vnd.mambu.v2+json'
         if use_apikey:
             # Api Key API Consumer Authentication: https://support.mambu.com/docs/api-consumers
             self.__session.headers['apikey'] = self.__apikey
@@ -163,7 +172,7 @@ class MambuClient(object):
 
 
     @backoff.on_exception(backoff.expo,
-                          (Server5xxError, ConnectionError, Server429Error),
+                          (Server5xxError, ConnectionError, Server429Error, ReadTimeout),
                           max_tries=7,
                           factor=3)
     def request(self, method, path=None, url=None, json=None, version=None, apikey_type=None, **kwargs):
@@ -208,6 +217,7 @@ class MambuClient(object):
                 method=method,
                 url=url,
                 json=json,
+                timeout=(5, 30),
                 **kwargs)
             timer.tags[metrics.Tag.http_status_code] = response.status_code
 

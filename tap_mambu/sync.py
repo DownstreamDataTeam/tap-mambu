@@ -852,6 +852,7 @@ def sync(client, config, catalog, state):
 
     # For each endpoint (above), determine if the stream should be streamed
     #   (based on the catalog and last_stream), then sync those streams.
+    selected_streams = sorted(selected_streams)
     for stream_name in selected_streams:
         endpoint_config = endpoints.get(stream_name)
         if endpoint_config is None:
@@ -864,6 +865,7 @@ def sync(client, config, catalog, state):
         if should_stream:
             # loop through each sub type
             sub_types = endpoint_config.get('sub_types', ['self'])
+            sub_types = sorted(sub_types)
             for sub_type in sub_types:
                 LOGGER.info('START Syncing: {}, Type: {}'.format(stream_name, sub_type))
 

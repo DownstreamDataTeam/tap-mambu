@@ -15,6 +15,9 @@ def discover():
             for field_name in stream.get('replication_keys'):
                 metadata.write(mdata, ('properties', field_name), 'inclusion', 'automatic')
 
+        for key in mdata:
+            mdata[key]["selected"] = True
+
         catalog.streams.append(CatalogEntry(
             stream=stream_name,
             tap_stream_id=stream_name,
