@@ -104,24 +104,19 @@ class MambuClient(object):
                  apikey_audit,
                  page_size,
                  user_agent=None,
-                 full_domain=None):
+                 test_full_url=None):
         self.__username = username
         self.__password = password
         self.__subdomain = subdomain
+        self.__session = requests.Session()
         base_url = "https://{}.mambu.com/api".format(subdomain)
-        if full_domain is not None:
-            base_url = full_domain
+        if test_full_url is not None:
+            base_url = test_full_url
+            self.__session.verify = False
         self.base_url = base_url
         self.page_size = page_size
         self.__user_agent = user_agent
         self.__apikey = apikey
-        self.__session = requests.Session()
-        # self.__session.proxies.update({
-        #     "http": "http://localhost:1080",
-        #     "https": "https://localhost:1080",
-        #     "socks": "http://localhost:1080"
-        # })
-        self.__session.verify = True
         self.__verified = False
         self.__apikey_audit = apikey_audit
 

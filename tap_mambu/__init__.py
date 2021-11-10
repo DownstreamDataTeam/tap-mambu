@@ -19,6 +19,7 @@ REQUIRED_CONFIG_KEYS = [
 DEFAULT_PAGE_SIZE = 500
 
 parsed_args = None
+integration_test = False
 
 
 def do_discover():
@@ -38,7 +39,7 @@ def main():
                      parsed_args.config.get('apikey_audit'),
                      int(parsed_args.config.get('page_size', DEFAULT_PAGE_SIZE)),
                      user_agent=parsed_args.config['user_agent'],
-                     full_domain=parsed_args.config.get('full_domain')) as client:
+                     test_full_url=parsed_args.config.get('test_full_url') if integration_test else None) as client:
 
         state = {}
         if parsed_args.state:
@@ -55,7 +56,5 @@ def main():
 
 if __name__ == '__main__':
     parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
-
-    parser = argparse.ArgumentParser()
 
     main()

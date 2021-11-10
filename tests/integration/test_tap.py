@@ -14,6 +14,7 @@ def test_tap(capsys):
     tap_mambu.parsed_args.state = {}
     tap_mambu.parsed_args.discover = True
     tap_mambu.parsed_args.properties = None
+    tap_mambu.integration_test = True
     tap_mambu.main()
     captured = capsys.readouterr()
     with open("./expected_catalog.json") as fd:
@@ -28,6 +29,7 @@ def test_tap(capsys):
     tap_mambu.parsed_args.state = tap_mambu.singer.utils.load_json("./state.json")
     tap_mambu.parsed_args.discover = None
     tap_mambu.parsed_args.properties = None
+    tap_mambu.integration_test = True
     tap_mambu.main()
     captured = capsys.readouterr()
     with open("./expected_output.json") as fd:
