@@ -4,7 +4,7 @@ import sys
 import json
 import argparse
 import singer
-from singer import metadata, utils
+from singer import metadata, utils, Catalog
 from tap_mambu.client import MambuClient
 from tap_mambu.discover import discover
 from tap_mambu.sync import sync
@@ -19,6 +19,9 @@ REQUIRED_CONFIG_KEYS = [
 
 DEFAULT_PAGE_SIZE = 500
 
+parsed_args = None
+
+
 def do_discover():
 
     LOGGER.info('Starting discover')
@@ -29,16 +32,14 @@ def do_discover():
 
 @singer.utils.handle_top_exception(LOGGER)
 def main():
-
-    parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
-
     with MambuClient(parsed_args.config.get('username'),
                      parsed_args.config.get('password'),
                      parsed_args.config.get('apikey'),
                      parsed_args.config['subdomain'],
                      parsed_args.config.get('apikey_audit'),
                      int(parsed_args.config.get('page_size', DEFAULT_PAGE_SIZE)),
-                     user_agent=parsed_args.config['user_agent']) as client:
+                     user_agent=parsed_args.config['user_agent'],
+                     full_domain=parsed_args.config.get('full_domain')) as client:
 
         state = {}
         if parsed_args.state:
@@ -52,5 +53,10 @@ def main():
                  catalog=parsed_args.catalog,
                  state=state)
 
+
 if __name__ == '__main__':
+    parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
+
+    parser = argparse.ArgumentParser()
+
     main()
