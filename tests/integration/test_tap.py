@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from singer import Catalog
 
 import tap_mambu
 
@@ -23,7 +24,7 @@ def test_tap(capsys):
     # Test run
     tap_mambu.parsed_args = tap_mambu.argparse.Namespace()
     tap_mambu.parsed_args.config = tap_mambu.singer.utils.load_json("./config.json")
-    tap_mambu.parsed_args.catalog = tap_mambu.Catalog.load("./catalog.json")
+    tap_mambu.parsed_args.catalog = Catalog.load("./catalog.json")
     tap_mambu.parsed_args.state = tap_mambu.singer.utils.load_json("./state.json")
     tap_mambu.parsed_args.discover = None
     tap_mambu.parsed_args.properties = None
