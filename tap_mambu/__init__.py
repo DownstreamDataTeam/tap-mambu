@@ -4,7 +4,6 @@ import sys
 import json
 import argparse
 import singer
-from singer import metadata, utils, Catalog
 from tap_mambu.client import MambuClient
 from tap_mambu.discover import discover
 from tap_mambu.sync import sync
