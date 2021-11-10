@@ -212,7 +212,6 @@ class MambuClient(object):
                 method=method,
                 url=url,
                 json=json,
-                timeout=(5, 30),
                 **kwargs)
             timer.tags[metrics.Tag.http_status_code] = response.status_code
 
