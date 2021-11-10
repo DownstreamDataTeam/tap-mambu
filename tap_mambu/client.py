@@ -121,7 +121,7 @@ class MambuClient(object):
         #     "https": "https://localhost:1080",
         #     "socks": "http://localhost:1080"
         # })
-        self.__session.verify = False
+        self.__session.verify = True
         self.__verified = False
         self.__apikey_audit = apikey_audit
 
@@ -172,7 +172,7 @@ class MambuClient(object):
 
 
     @backoff.on_exception(backoff.expo,
-                          (Server5xxError, ConnectionError, Server429Error, ReadTimeout),
+                          (Server5xxError, ConnectionError, Server429Error),
                           max_tries=7,
                           factor=3)
     def request(self, method, path=None, url=None, json=None, version=None, apikey_type=None, **kwargs):
