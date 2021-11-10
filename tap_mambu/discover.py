@@ -15,8 +15,15 @@ def discover():
             for field_name in stream.get('replication_keys'):
                 metadata.write(mdata, ('properties', field_name), 'inclusion', 'automatic')
 
+        selected = stream_name not in [
+            "tasks",
+            "activities",
+            "gl_accounts",
+            "communications",
+            "loan_repayments",
+        ]
         for key in mdata:
-            mdata[key]["selected"] = True
+            mdata[key]["selected"] = selected
 
         catalog.streams.append(CatalogEntry(
             stream=stream_name,
