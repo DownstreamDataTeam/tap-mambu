@@ -297,19 +297,7 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
                         parent_id = record.get(parent_id_field)
 
                         # sync_endpoint for child
-                        LOGGER.info('Syncing: {}, parent_stream: {}, parent_id: {}'.format(
-                            child_stream_name,
-                            stream_name,
-                            parent_id))
-                        child_path = child_endpoint_config.get('path').format(str(parent_id))
-                        child_total_records = sync_endpoint(
-                            client=client,
-                            catalog=catalog,
-                            state=state,
-                            start_date=start_date,
-                            stream_name=child_stream_name,
-                            path=child_path,
-                            endpoint_config=child_endpoint_config,
+                        LOGGER.info('Syncing: {}, padpoint_config,
                             api_version=child_endpoint_config.get('api_version', 'v2'),
                             api_method=child_endpoint_config.get('api_method', 'GET'),
                             static_params=child_endpoint_config.get('params', {}),
