@@ -296,7 +296,7 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
                             i = i + 1
                         parent_id = record.get(parent_id_field)
 
-                        # sync_endpoint for child
+                        # sync_endpoint for child #
                         LOGGER.info('Syncing: {}, parent_stream: {}, parent_id: {}'.format(
                             child_stream_name,
                             stream_name,
