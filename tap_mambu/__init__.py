@@ -2,12 +2,10 @@
 
 import sys
 import json
-import argparse
 import singer
-from singer import metadata, utils
-from tap_mambu.client import MambuClient
-from tap_mambu.discover import discover
-from tap_mambu.sync import sync
+import coverage
+import time
+import os.path
 
 LOGGER = singer.get_logger()
 
@@ -19,16 +17,29 @@ REQUIRED_CONFIG_KEYS = [
 
 DEFAULT_PAGE_SIZE = 500
 
-def do_discover():
 
-    LOGGER.info('Starting discover')
-    catalog = discover()
-    json.dump(catalog.to_dict(), sys.stdout, indent=2)
-    LOGGER.info('Finished discover')
+def get_test_coverage(func):
+    def wrapper():
+        if os.environ.get('GET_TEST_COVERAGE', False):
+            cov = coverage.Coverage(auto_data=True, data_suffix=time.perf_counter(), cover_pylib=True, branch=True,
+                                    check_preimported=True,
+                                    omit=[__file__],
+                                    source=[os.path.dirname(__file__)])
+            cov.start()
+            func()
+            cov.stop()
+            cov.save()
+        else:
+            func()
+    return wrapper
 
 
+@get_test_coverage
 @singer.utils.handle_top_exception(LOGGER)
 def main():
+    from tap_mambu.client import MambuClient
+    from tap_mambu.sync import sync
+    from tap_mambu.discover import discover
 
     parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
 
@@ -45,7 +56,9 @@ def main():
             state = parsed_args.state
 
         if parsed_args.discover:
-            do_discover()
+            LOGGER.info('Starting discover')
+            json.dump(discover().to_dict(), sys.stdout, indent=2)
+            LOGGER.info('Finished discover')
         elif parsed_args.catalog:
             sync(client=client,
                  config=parsed_args.config,

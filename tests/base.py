@@ -5,6 +5,7 @@ Run discovery for as a prerequisite for most tests
 import os
 import unittest
 from tap_tester import connections, menagerie, runner
+from singer.utils import load_json
 
 
 class MambuBaseTest(unittest.TestCase):
@@ -21,6 +22,21 @@ class MambuBaseTest(unittest.TestCase):
     INCREMENTAL = "INCREMENTAL"
     FULL_TABLE = "FULL_TABLE"
     START_DATE_FORMAT = "%Y-%m-%dT00:00:00Z"
+    GET_CREDENTIALS_FROM_CONFIG = True
+    CONFIG_FILE_NAME = 'test_config.json'
+    CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'../{CONFIG_FILE_NAME}')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.GET_CREDENTIALS_FROM_CONFIG:
+            self.config = load_json(self.CONFIG_FILE_PATH)
+            os.environ['STITCH_TAP_PATH'] = self.config.get('stitch_tap_path')
+            os.environ['STITCH_TARGET_PATH'] = self.config.get('stitch_target_path')
+            os.environ['STITCH_TARGET_PATH'] = self.config.get('stitch_target_path')
+            coverage_flag = self.config.get('get_test_coverage', False)
+            if coverage_flag:
+                os.environ['GET_TEST_COVERAGE'] = coverage_flag
+
 
     @staticmethod
     def tap_name():
@@ -248,12 +264,20 @@ class MambuBaseTest(unittest.TestCase):
         menagerie.verify_check_exit_status(self, exit_status, check_job_name)
 
     def get_properties(self, original_properties=True):
-        properties = {
-            'start_date': '2017-01-01T00:00:00Z',
-            'username': os.environ['TAP_MAMBU_USERNAME'],
-            'subdomain': os.environ['TAP_MAMBU_SUBDOMAIN'],
-            'page_size': '100'
-        }
+        if self.GET_CREDENTIALS_FROM_CONFIG:
+            properties = {
+                'start_date': self.config.get('start_date'),
+                'username': self.config.get('username'),
+                'subdomain': self.config.get('subdomain'),
+                'page_size': self.config.get('page_size', '100')
+            }
+        else:
+            properties = {
+                'start_date': '2017-01-01T00:00:00Z',
+                'username': os.environ['TAP_MAMBU_USERNAME'],
+                'subdomain': os.environ['TAP_MAMBU_SUBDOMAIN'],
+                'page_size': '100'
+            }
 
         if not original_properties:
             properties['start_date'] = '2021-01-01T00:00:00Z'
@@ -262,7 +286,7 @@ class MambuBaseTest(unittest.TestCase):
 
     def get_credentials(self):
         return {
-            "password": os.environ['TAP_MAMBU_PASSWORD']
+            "password": os.environ['TAP_MAMBU_PASSWORD'] if not self.GET_CREDENTIALS_FROM_CONFIG else self.config.get('password')
         }
 
     def expected_primary_keys(self):
