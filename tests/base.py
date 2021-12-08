@@ -32,7 +32,6 @@ class MambuBaseTest(unittest.TestCase):
             self.config = load_json(self.CONFIG_FILE_PATH)
             os.environ['STITCH_TAP_PATH'] = self.config.get('stitch_tap_path')
             os.environ['STITCH_TARGET_PATH'] = self.config.get('stitch_target_path')
-            os.environ['STITCH_TARGET_PATH'] = self.config.get('stitch_target_path')
             coverage_flag = self.config.get('get_test_coverage', False)
             if coverage_flag:
                 os.environ['GET_TEST_COVERAGE'] = coverage_flag
