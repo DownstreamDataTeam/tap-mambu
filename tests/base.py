@@ -245,6 +245,12 @@ class MambuBaseTest(unittest.TestCase):
                 self.REPLICATION_KEYS: {
                     "last_paid_date"
                 }
+            },
+            "audit_trail": {
+                self.REPLICATION_METHOD: "INCREMENTAL",
+                self.REPLICATION_KEYS: {
+                    "occurred_at"
+                }
             }
         }
 
@@ -285,7 +291,8 @@ class MambuBaseTest(unittest.TestCase):
 
     def get_credentials(self):
         return {
-            "password": os.environ['TAP_MAMBU_PASSWORD'] if not self.GET_CREDENTIALS_FROM_CONFIG else self.config.get('password')
+            "password": os.environ['TAP_MAMBU_PASSWORD'] if not self.GET_CREDENTIALS_FROM_CONFIG else self.config.get('password'),
+            "apikey_audit": self.config.get('apikey_audit') if self.GET_CREDENTIALS_FROM_CONFIG else ""
         }
 
     def expected_primary_keys(self):
